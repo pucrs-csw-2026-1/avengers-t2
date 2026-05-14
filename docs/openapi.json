@@ -1,0 +1,1459 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Events API",
+    "description": "API REST para gerenciamento de eventos, seções e matrículas",
+    "version": "1.0.0"
+  },
+  "components": {
+    "schemas": {}
+  },
+  "paths": {
+    "/events": {
+      "post": {
+        "summary": "Cria um evento",
+        "tags": [
+          "Events"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "title",
+                  "starts_at",
+                  "ends_at",
+                  "timezone",
+                  "capacity",
+                  "created_by"
+                ],
+                "properties": {
+                  "title": {
+                    "type": "string"
+                  },
+                  "description": {
+                    "type": "string"
+                  },
+                  "starts_at": {
+                    "format": "date-time",
+                    "type": "string"
+                  },
+                  "ends_at": {
+                    "format": "date-time",
+                    "type": "string"
+                  },
+                  "timezone": {
+                    "type": "string"
+                  },
+                  "registration_deadline": {
+                    "format": "date-time",
+                    "type": "string"
+                  },
+                  "location": {
+                    "type": "object",
+                    "properties": {
+                      "venue": {
+                        "description": "Nome do local",
+                        "type": "string"
+                      },
+                      "address": {
+                        "type": "string"
+                      },
+                      "city": {
+                        "type": "string"
+                      },
+                      "state": {
+                        "maxLength": 2,
+                        "type": "string"
+                      },
+                      "country": {
+                        "minLength": 2,
+                        "maxLength": 2,
+                        "type": "string"
+                      }
+                    }
+                  },
+                  "capacity": {
+                    "minimum": 1,
+                    "type": "integer"
+                  },
+                  "category": {
+                    "type": "string"
+                  },
+                  "language": {
+                    "type": "string"
+                  },
+                  "created_by": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "id",
+                    "title",
+                    "starts_at",
+                    "ends_at",
+                    "timezone",
+                    "capacity",
+                    "created_at",
+                    "updated_at",
+                    "deleted_at",
+                    "deleted_by",
+                    "created_by"
+                  ],
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "example": "evt_01hw"
+                    },
+                    "title": {
+                      "type": "string"
+                    },
+                    "description": {
+                      "type": "string"
+                    },
+                    "starts_at": {
+                      "format": "date-time",
+                      "type": "string"
+                    },
+                    "ends_at": {
+                      "format": "date-time",
+                      "type": "string"
+                    },
+                    "timezone": {
+                      "type": "string",
+                      "example": "America/Sao_Paulo"
+                    },
+                    "registration_deadline": {
+                      "format": "date-time",
+                      "type": "string"
+                    },
+                    "location": {
+                      "type": "object",
+                      "properties": {
+                        "venue": {
+                          "description": "Nome do local",
+                          "type": "string"
+                        },
+                        "address": {
+                          "type": "string"
+                        },
+                        "city": {
+                          "type": "string"
+                        },
+                        "state": {
+                          "maxLength": 2,
+                          "type": "string"
+                        },
+                        "country": {
+                          "minLength": 2,
+                          "maxLength": 2,
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "capacity": {
+                      "minimum": 1,
+                      "type": "integer"
+                    },
+                    "category": {
+                      "type": "string"
+                    },
+                    "language": {
+                      "type": "string",
+                      "example": "pt-BR"
+                    },
+                    "created_at": {
+                      "format": "date-time",
+                      "type": "string"
+                    },
+                    "updated_at": {
+                      "format": "date-time",
+                      "type": "string"
+                    },
+                    "deleted_at": {
+                      "anyOf": [
+                        {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "deleted_by": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "created_by": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "summary": "Lista eventos com paginação",
+        "tags": [
+          "Events"
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "minimum": 1,
+              "default": 1,
+              "type": "integer"
+            },
+            "in": "query",
+            "name": "page",
+            "required": false
+          },
+          {
+            "schema": {
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20,
+              "type": "integer"
+            },
+            "in": "query",
+            "name": "limit",
+            "required": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data",
+                    "total",
+                    "page",
+                    "limit"
+                  ],
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "required": [
+                          "id",
+                          "title",
+                          "starts_at",
+                          "ends_at",
+                          "timezone",
+                          "capacity",
+                          "created_at",
+                          "updated_at",
+                          "deleted_at",
+                          "deleted_by",
+                          "created_by"
+                        ],
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "example": "evt_01hw"
+                          },
+                          "title": {
+                            "type": "string"
+                          },
+                          "description": {
+                            "type": "string"
+                          },
+                          "starts_at": {
+                            "format": "date-time",
+                            "type": "string"
+                          },
+                          "ends_at": {
+                            "format": "date-time",
+                            "type": "string"
+                          },
+                          "timezone": {
+                            "type": "string",
+                            "example": "America/Sao_Paulo"
+                          },
+                          "registration_deadline": {
+                            "format": "date-time",
+                            "type": "string"
+                          },
+                          "location": {
+                            "type": "object",
+                            "properties": {
+                              "venue": {
+                                "description": "Nome do local",
+                                "type": "string"
+                              },
+                              "address": {
+                                "type": "string"
+                              },
+                              "city": {
+                                "type": "string"
+                              },
+                              "state": {
+                                "maxLength": 2,
+                                "type": "string"
+                              },
+                              "country": {
+                                "minLength": 2,
+                                "maxLength": 2,
+                                "type": "string"
+                              }
+                            }
+                          },
+                          "capacity": {
+                            "minimum": 1,
+                            "type": "integer"
+                          },
+                          "category": {
+                            "type": "string"
+                          },
+                          "language": {
+                            "type": "string",
+                            "example": "pt-BR"
+                          },
+                          "created_at": {
+                            "format": "date-time",
+                            "type": "string"
+                          },
+                          "updated_at": {
+                            "format": "date-time",
+                            "type": "string"
+                          },
+                          "deleted_at": {
+                            "anyOf": [
+                              {
+                                "format": "date-time",
+                                "type": "string"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "deleted_by": {
+                            "anyOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "created_by": {
+                            "type": "string"
+                          }
+                        },
+                        "title": "Event"
+                      }
+                    },
+                    "total": {
+                      "type": "integer"
+                    },
+                    "page": {
+                      "type": "integer"
+                    },
+                    "limit": {
+                      "type": "integer"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/events/{id}": {
+      "get": {
+        "summary": "Busca evento por ID",
+        "tags": [
+          "Events"
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "id",
+                    "title",
+                    "starts_at",
+                    "ends_at",
+                    "timezone",
+                    "capacity",
+                    "created_at",
+                    "updated_at",
+                    "deleted_at",
+                    "deleted_by",
+                    "created_by"
+                  ],
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "example": "evt_01hw"
+                    },
+                    "title": {
+                      "type": "string"
+                    },
+                    "description": {
+                      "type": "string"
+                    },
+                    "starts_at": {
+                      "format": "date-time",
+                      "type": "string"
+                    },
+                    "ends_at": {
+                      "format": "date-time",
+                      "type": "string"
+                    },
+                    "timezone": {
+                      "type": "string",
+                      "example": "America/Sao_Paulo"
+                    },
+                    "registration_deadline": {
+                      "format": "date-time",
+                      "type": "string"
+                    },
+                    "location": {
+                      "type": "object",
+                      "properties": {
+                        "venue": {
+                          "description": "Nome do local",
+                          "type": "string"
+                        },
+                        "address": {
+                          "type": "string"
+                        },
+                        "city": {
+                          "type": "string"
+                        },
+                        "state": {
+                          "maxLength": 2,
+                          "type": "string"
+                        },
+                        "country": {
+                          "minLength": 2,
+                          "maxLength": 2,
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "capacity": {
+                      "minimum": 1,
+                      "type": "integer"
+                    },
+                    "category": {
+                      "type": "string"
+                    },
+                    "language": {
+                      "type": "string",
+                      "example": "pt-BR"
+                    },
+                    "created_at": {
+                      "format": "date-time",
+                      "type": "string"
+                    },
+                    "updated_at": {
+                      "format": "date-time",
+                      "type": "string"
+                    },
+                    "deleted_at": {
+                      "anyOf": [
+                        {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "deleted_by": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "created_by": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "summary": "Atualiza evento completo",
+        "tags": [
+          "Events"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "title",
+                  "starts_at",
+                  "ends_at",
+                  "timezone",
+                  "capacity",
+                  "created_by"
+                ],
+                "properties": {
+                  "title": {
+                    "type": "string"
+                  },
+                  "description": {
+                    "type": "string"
+                  },
+                  "starts_at": {
+                    "format": "date-time",
+                    "type": "string"
+                  },
+                  "ends_at": {
+                    "format": "date-time",
+                    "type": "string"
+                  },
+                  "timezone": {
+                    "type": "string"
+                  },
+                  "registration_deadline": {
+                    "format": "date-time",
+                    "type": "string"
+                  },
+                  "location": {
+                    "type": "object",
+                    "properties": {
+                      "venue": {
+                        "description": "Nome do local",
+                        "type": "string"
+                      },
+                      "address": {
+                        "type": "string"
+                      },
+                      "city": {
+                        "type": "string"
+                      },
+                      "state": {
+                        "maxLength": 2,
+                        "type": "string"
+                      },
+                      "country": {
+                        "minLength": 2,
+                        "maxLength": 2,
+                        "type": "string"
+                      }
+                    }
+                  },
+                  "capacity": {
+                    "minimum": 1,
+                    "type": "integer"
+                  },
+                  "category": {
+                    "type": "string"
+                  },
+                  "language": {
+                    "type": "string"
+                  },
+                  "created_by": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "id",
+                    "title",
+                    "starts_at",
+                    "ends_at",
+                    "timezone",
+                    "capacity",
+                    "created_at",
+                    "updated_at",
+                    "deleted_at",
+                    "deleted_by",
+                    "created_by"
+                  ],
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "example": "evt_01hw"
+                    },
+                    "title": {
+                      "type": "string"
+                    },
+                    "description": {
+                      "type": "string"
+                    },
+                    "starts_at": {
+                      "format": "date-time",
+                      "type": "string"
+                    },
+                    "ends_at": {
+                      "format": "date-time",
+                      "type": "string"
+                    },
+                    "timezone": {
+                      "type": "string",
+                      "example": "America/Sao_Paulo"
+                    },
+                    "registration_deadline": {
+                      "format": "date-time",
+                      "type": "string"
+                    },
+                    "location": {
+                      "type": "object",
+                      "properties": {
+                        "venue": {
+                          "description": "Nome do local",
+                          "type": "string"
+                        },
+                        "address": {
+                          "type": "string"
+                        },
+                        "city": {
+                          "type": "string"
+                        },
+                        "state": {
+                          "maxLength": 2,
+                          "type": "string"
+                        },
+                        "country": {
+                          "minLength": 2,
+                          "maxLength": 2,
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "capacity": {
+                      "minimum": 1,
+                      "type": "integer"
+                    },
+                    "category": {
+                      "type": "string"
+                    },
+                    "language": {
+                      "type": "string",
+                      "example": "pt-BR"
+                    },
+                    "created_at": {
+                      "format": "date-time",
+                      "type": "string"
+                    },
+                    "updated_at": {
+                      "format": "date-time",
+                      "type": "string"
+                    },
+                    "deleted_at": {
+                      "anyOf": [
+                        {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "deleted_by": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "created_by": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "summary": "Atualiza evento parcialmente",
+        "tags": [
+          "Events"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "title": {
+                    "type": "string"
+                  },
+                  "description": {
+                    "type": "string"
+                  },
+                  "starts_at": {
+                    "format": "date-time",
+                    "type": "string"
+                  },
+                  "ends_at": {
+                    "format": "date-time",
+                    "type": "string"
+                  },
+                  "timezone": {
+                    "type": "string"
+                  },
+                  "registration_deadline": {
+                    "format": "date-time",
+                    "type": "string"
+                  },
+                  "location": {
+                    "type": "object",
+                    "properties": {
+                      "venue": {
+                        "description": "Nome do local",
+                        "type": "string"
+                      },
+                      "address": {
+                        "type": "string"
+                      },
+                      "city": {
+                        "type": "string"
+                      },
+                      "state": {
+                        "maxLength": 2,
+                        "type": "string"
+                      },
+                      "country": {
+                        "minLength": 2,
+                        "maxLength": 2,
+                        "type": "string"
+                      }
+                    }
+                  },
+                  "capacity": {
+                    "minimum": 1,
+                    "type": "integer"
+                  },
+                  "category": {
+                    "type": "string"
+                  },
+                  "language": {
+                    "type": "string"
+                  },
+                  "created_by": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "id",
+                    "title",
+                    "starts_at",
+                    "ends_at",
+                    "timezone",
+                    "capacity",
+                    "created_at",
+                    "updated_at",
+                    "deleted_at",
+                    "deleted_by",
+                    "created_by"
+                  ],
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "example": "evt_01hw"
+                    },
+                    "title": {
+                      "type": "string"
+                    },
+                    "description": {
+                      "type": "string"
+                    },
+                    "starts_at": {
+                      "format": "date-time",
+                      "type": "string"
+                    },
+                    "ends_at": {
+                      "format": "date-time",
+                      "type": "string"
+                    },
+                    "timezone": {
+                      "type": "string",
+                      "example": "America/Sao_Paulo"
+                    },
+                    "registration_deadline": {
+                      "format": "date-time",
+                      "type": "string"
+                    },
+                    "location": {
+                      "type": "object",
+                      "properties": {
+                        "venue": {
+                          "description": "Nome do local",
+                          "type": "string"
+                        },
+                        "address": {
+                          "type": "string"
+                        },
+                        "city": {
+                          "type": "string"
+                        },
+                        "state": {
+                          "maxLength": 2,
+                          "type": "string"
+                        },
+                        "country": {
+                          "minLength": 2,
+                          "maxLength": 2,
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "capacity": {
+                      "minimum": 1,
+                      "type": "integer"
+                    },
+                    "category": {
+                      "type": "string"
+                    },
+                    "language": {
+                      "type": "string",
+                      "example": "pt-BR"
+                    },
+                    "created_at": {
+                      "format": "date-time",
+                      "type": "string"
+                    },
+                    "updated_at": {
+                      "format": "date-time",
+                      "type": "string"
+                    },
+                    "deleted_at": {
+                      "anyOf": [
+                        {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "deleted_by": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "created_by": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Soft delete — preenche deleted_at",
+        "tags": [
+          "Events"
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "id",
+                    "title",
+                    "starts_at",
+                    "ends_at",
+                    "timezone",
+                    "capacity",
+                    "created_at",
+                    "updated_at",
+                    "deleted_at",
+                    "deleted_by",
+                    "created_by"
+                  ],
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "example": "evt_01hw"
+                    },
+                    "title": {
+                      "type": "string"
+                    },
+                    "description": {
+                      "type": "string"
+                    },
+                    "starts_at": {
+                      "format": "date-time",
+                      "type": "string"
+                    },
+                    "ends_at": {
+                      "format": "date-time",
+                      "type": "string"
+                    },
+                    "timezone": {
+                      "type": "string",
+                      "example": "America/Sao_Paulo"
+                    },
+                    "registration_deadline": {
+                      "format": "date-time",
+                      "type": "string"
+                    },
+                    "location": {
+                      "type": "object",
+                      "properties": {
+                        "venue": {
+                          "description": "Nome do local",
+                          "type": "string"
+                        },
+                        "address": {
+                          "type": "string"
+                        },
+                        "city": {
+                          "type": "string"
+                        },
+                        "state": {
+                          "maxLength": 2,
+                          "type": "string"
+                        },
+                        "country": {
+                          "minLength": 2,
+                          "maxLength": 2,
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "capacity": {
+                      "minimum": 1,
+                      "type": "integer"
+                    },
+                    "category": {
+                      "type": "string"
+                    },
+                    "language": {
+                      "type": "string",
+                      "example": "pt-BR"
+                    },
+                    "created_at": {
+                      "format": "date-time",
+                      "type": "string"
+                    },
+                    "updated_at": {
+                      "format": "date-time",
+                      "type": "string"
+                    },
+                    "deleted_at": {
+                      "anyOf": [
+                        {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "deleted_by": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "created_by": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/events/{id}/sections": {
+      "get": {
+        "summary": "Lista seções do evento",
+        "tags": [
+          "Sections"
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "required": [
+                      "id_section",
+                      "title_section",
+                      "type",
+                      "starts_at",
+                      "ends_at",
+                      "timezone",
+                      "workload_minutes",
+                      "created_at",
+                      "updated_at",
+                      "deleted_at",
+                      "deleted_by",
+                      "created_by"
+                    ],
+                    "properties": {
+                      "id_section": {
+                        "type": "string",
+                        "example": "sec_01hw"
+                      },
+                      "title_section": {
+                        "type": "string"
+                      },
+                      "description_section": {
+                        "type": "string"
+                      },
+                      "type": {
+                        "type": "string",
+                        "example": "palestra"
+                      },
+                      "starts_at": {
+                        "format": "date-time",
+                        "type": "string"
+                      },
+                      "ends_at": {
+                        "format": "date-time",
+                        "type": "string"
+                      },
+                      "timezone": {
+                        "type": "string",
+                        "example": "America/Sao_Paulo"
+                      },
+                      "registration_deadline_section": {
+                        "format": "date-time",
+                        "type": "string"
+                      },
+                      "thumbnail_url": {
+                        "format": "uri",
+                        "type": "string"
+                      },
+                      "capacity_section": {
+                        "minimum": 1,
+                        "type": "integer"
+                      },
+                      "workload_minutes": {
+                        "minimum": 1,
+                        "description": "Carga horária em minutos — obrigatório para emissão de certificado",
+                        "type": "integer"
+                      },
+                      "category_section": {
+                        "type": "string"
+                      },
+                      "language_section": {
+                        "type": "string",
+                        "example": "pt-BR"
+                      },
+                      "created_at": {
+                        "format": "date-time",
+                        "type": "string"
+                      },
+                      "updated_at": {
+                        "format": "date-time",
+                        "type": "string"
+                      },
+                      "deleted_at": {
+                        "anyOf": [
+                          {
+                            "format": "date-time",
+                            "type": "string"
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      },
+                      "deleted_by": {
+                        "anyOf": [
+                          {
+                            "type": "string"
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      },
+                      "created_by": {
+                        "type": "string"
+                      }
+                    },
+                    "title": "Section"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/events/{id}/roles": {
+      "get": {
+        "summary": "Lista roles com permissão de matrícula no evento",
+        "tags": [
+          "Roles"
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "required": [
+                      "event_id",
+                      "role"
+                    ],
+                    "properties": {
+                      "event_id": {
+                        "type": "string"
+                      },
+                      "role": {
+                        "description": "Role livre — ex: student, professor, staff",
+                        "type": "string"
+                      }
+                    },
+                    "title": "EventRole"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Adiciona role ao evento",
+        "tags": [
+          "Roles"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "role"
+                ],
+                "properties": {
+                  "role": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "event_id",
+                    "role"
+                  ],
+                  "properties": {
+                    "event_id": {
+                      "type": "string"
+                    },
+                    "role": {
+                      "description": "Role livre — ex: student, professor, staff",
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/events/{id}/roles/{role}": {
+      "delete": {
+        "summary": "Remove role do evento",
+        "tags": [
+          "Roles"
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "path",
+            "name": "role",
+            "required": true
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Default Response"
+          }
+        }
+      }
+    },
+    "/events/{id}/metrics": {
+      "get": {
+        "summary": "Métricas de ocupação e seções do evento",
+        "tags": [
+          "Metrics"
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "event_id",
+                    "capacity",
+                    "enrolled",
+                    "available_spots",
+                    "occupancy_percentage",
+                    "sections"
+                  ],
+                  "properties": {
+                    "event_id": {
+                      "type": "string"
+                    },
+                    "capacity": {
+                      "description": "Capacidade total do evento",
+                      "type": "integer"
+                    },
+                    "enrolled": {
+                      "description": "Total de inscritos",
+                      "type": "integer"
+                    },
+                    "available_spots": {
+                      "description": "Vagas restantes",
+                      "type": "integer"
+                    },
+                    "occupancy_percentage": {
+                      "minimum": 0,
+                      "maximum": 100,
+                      "description": "Percentual de ocupação",
+                      "type": "number"
+                    },
+                    "sections": {
+                      "type": "object",
+                      "required": [
+                        "total",
+                        "by_type",
+                        "total_workload_minutes"
+                      ],
+                      "properties": {
+                        "total": {
+                          "description": "Total de seções no evento",
+                          "type": "integer"
+                        },
+                        "by_type": {
+                          "description": "Contagem de seções agrupadas por tipo",
+                          "type": "object",
+                          "additionalProperties": {
+                            "type": "integer"
+                          }
+                        },
+                        "total_workload_minutes": {
+                          "description": "Soma de workload_minutes de todas as seções",
+                          "type": "integer"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "tags": [
+    {
+      "name": "Events",
+      "description": "CRUD de eventos"
+    },
+    {
+      "name": "Sections",
+      "description": "Seções de eventos"
+    },
+    {
+      "name": "Roles",
+      "description": "Roles de matrícula por evento"
+    },
+    {
+      "name": "Metrics",
+      "description": "Métricas de ocupação e seções"
+    }
+  ]
+}
