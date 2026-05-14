@@ -108,5 +108,214 @@
     },
     "role": "assistant",
     "content": "Commitado e enviado. Agora acesse **Settings → Pages → Source: GitHub Actions** no repositório `pucrs-csw-2026-1/avengers-t2` para habilitar o deploy — o workflow já vai rodar automaticamente após isso."
+  },
+  {
+    "timestamp": "2026-05-14T21:20:15.609Z",
+    "source": "claude",
+    "git_branch": "main",
+    "git_user_name": "guilherme-messer",
+    "call_context": {
+      "cwd": "/home/gui/avengers-t2"
+    },
+    "role": "user",
+    "content": "consegue adicionar os schemas no swagger tambem?"
+  },
+  {
+    "timestamp": "2026-05-14T21:20:18.352Z",
+    "source": "claude",
+    "git_branch": "main",
+    "git_user_name": "guilherme-messer",
+    "call_context": {
+      "cwd": "/home/gui/avengers-t2"
+    },
+    "role": "assistant",
+    "content": "Deixa eu ver os schemas e rotas atuais."
+  },
+  {
+    "timestamp": "2026-05-14T21:21:05.347Z",
+    "source": "claude",
+    "git_branch": "main",
+    "git_user_name": "guilherme-messer",
+    "call_context": {
+      "cwd": "/home/gui/avengers-t2"
+    },
+    "role": "assistant",
+    "content": "O problema é que `components.schemas` está vazio — os schemas TypeBox com `$id` precisam ser registrados via `fastify.addSchema()` e referenciados com `Type.Ref()` nas rotas para aparecerem no Swagger como componentes reutilizáveis.\n\nVou criar um plugin de schemas, registrá-lo no servidor e atualizar as rotas."
+  },
+  {
+    "timestamp": "2026-05-14T21:21:10.983Z",
+    "source": "claude",
+    "git_branch": "main",
+    "git_user_name": "guilherme-messer",
+    "call_context": {
+      "cwd": "/home/gui/avengers-t2"
+    },
+    "role": "assistant",
+    "content": "`EventListResponseSchema` também precisa de `$id` para ser registrado:"
+  },
+  {
+    "timestamp": "2026-05-14T21:21:44.465Z",
+    "source": "claude",
+    "git_branch": "main",
+    "git_user_name": "guilherme-messer",
+    "call_context": {
+      "cwd": "/home/gui/avengers-t2"
+    },
+    "role": "assistant",
+    "content": "`Type.Ref(TSchema)` está deprecated no TypeBox 0.34 — o `$ref` dentro do `EventListResponseSchema` não é necessário. Posso simplesmente manter `EventSchema` inline ali; o que importa é registrar os schemas com `addSchema`, que os coloca em `components/schemas`."
+  },
+  {
+    "timestamp": "2026-05-14T21:21:48.560Z",
+    "source": "claude",
+    "git_branch": "main",
+    "git_user_name": "guilherme-messer",
+    "call_context": {
+      "cwd": "/home/gui/avengers-t2"
+    },
+    "role": "assistant",
+    "content": "Agora registro o plugin de schemas em `index.ts` antes das rotas:"
+  },
+  {
+    "timestamp": "2026-05-14T21:21:57.061Z",
+    "source": "claude",
+    "git_branch": "main",
+    "git_user_name": "guilherme-messer",
+    "call_context": {
+      "cwd": "/home/gui/avengers-t2"
+    },
+    "role": "assistant",
+    "content": "Agora testo e verifico se `components.schemas` está populado:"
+  },
+  {
+    "timestamp": "2026-05-14T21:22:31.984Z",
+    "source": "claude",
+    "git_branch": "main",
+    "git_user_name": "guilherme-messer",
+    "call_context": {
+      "cwd": "/home/gui/avengers-t2"
+    },
+    "role": "assistant",
+    "content": "`addSchema` sozinho não basta — `@fastify/swagger` só inclui em `components/schemas` os schemas que são referenciados por rotas. Preciso checar o que está chegando ao plugin:"
+  },
+  {
+    "timestamp": "2026-05-14T21:23:31.825Z",
+    "source": "claude",
+    "git_branch": "main",
+    "git_user_name": "guilherme-messer",
+    "call_context": {
+      "cwd": "/home/gui/avengers-t2"
+    },
+    "role": "assistant",
+    "content": "Vou criar um script de debug temporário para inspecionar o comportamento:"
+  },
+  {
+    "timestamp": "2026-05-14T21:24:15.197Z",
+    "source": "claude",
+    "git_branch": "main",
+    "git_user_name": "guilherme-messer",
+    "call_context": {
+      "cwd": "/home/gui/avengers-t2"
+    },
+    "role": "assistant",
+    "content": "Os schemas chegam como `def-0`...`def-7` em vez de usar o `$id`. Vou checar o que está dentro deles:"
+  },
+  {
+    "timestamp": "2026-05-14T21:25:32.416Z",
+    "source": "claude",
+    "git_branch": "main",
+    "git_user_name": "guilherme-messer",
+    "call_context": {
+      "cwd": "/home/gui/avengers-t2"
+    },
+    "role": "assistant",
+    "content": "Os schemas têm `$id` correto mas o Fastify nomeia como `def-N` porque as rotas usam os objetos TypeBox inline. Para que o swagger use os nomes corretos (`Event`, `Section`, etc.), as rotas precisam referenciar via `$ref`. Vou atualizar as rotas:"
+  },
+  {
+    "timestamp": "2026-05-14T21:26:16.135Z",
+    "source": "claude",
+    "git_branch": "main",
+    "git_user_name": "guilherme-messer",
+    "call_context": {
+      "cwd": "/home/gui/avengers-t2"
+    },
+    "role": "assistant",
+    "content": "Agora verifico se os nomes ficaram corretos:"
+  },
+  {
+    "timestamp": "2026-05-14T21:26:31.765Z",
+    "source": "claude",
+    "git_branch": "main",
+    "git_user_name": "guilherme-messer",
+    "call_context": {
+      "cwd": "/home/gui/avengers-t2"
+    },
+    "role": "assistant",
+    "content": "Ainda `def-N`. Deixa eu ver como o spec está gerando as referências nos paths:"
+  },
+  {
+    "timestamp": "2026-05-14T21:27:25.154Z",
+    "source": "claude",
+    "git_branch": "main",
+    "git_user_name": "guilherme-messer",
+    "call_context": {
+      "cwd": "/home/gui/avengers-t2"
+    },
+    "role": "assistant",
+    "content": "O problema está claro: `@fastify/swagger` v9 converte `$ref: 'Schema#'` em `$ref: '#/components/schemas/def-N'` porque ele usa numeração interna para componentes. Preciso verificar o comportamento real com a versão instalada:"
+  },
+  {
+    "timestamp": "2026-05-14T21:27:43.072Z",
+    "source": "claude",
+    "git_branch": "main",
+    "git_user_name": "guilherme-messer",
+    "call_context": {
+      "cwd": "/home/gui/avengers-t2"
+    },
+    "role": "assistant",
+    "content": "O `buildLocalReference` sempre retorna `def-${i}` — mas aceita override. Basta configurar um `refResolver` customizado no plugin do swagger:"
+  },
+  {
+    "timestamp": "2026-05-14T21:27:57.406Z",
+    "source": "claude",
+    "git_branch": "main",
+    "git_user_name": "guilherme-messer",
+    "call_context": {
+      "cwd": "/home/gui/avengers-t2"
+    },
+    "role": "assistant",
+    "content": "Agora os componentes têm os nomes corretos e as rotas usam `$ref: '#/components/schemas/Event'` etc. Vou regenerar o spec e commitar:"
+  },
+  {
+    "timestamp": "2026-05-14T21:28:16.494Z",
+    "source": "claude",
+    "git_branch": "main",
+    "git_user_name": "guilherme-messer",
+    "call_context": {
+      "cwd": "/home/gui/avengers-t2"
+    },
+    "role": "assistant",
+    "content": "O `generate-spec.ts` ainda não registra o `schemasPlugin`. Vou corrigir:"
+  },
+  {
+    "timestamp": "2026-05-14T21:28:32.223Z",
+    "source": "claude",
+    "git_branch": "main",
+    "git_user_name": "guilherme-messer",
+    "call_context": {
+      "cwd": "/home/gui/avengers-t2"
+    },
+    "role": "assistant",
+    "content": "Perfeito. Agora commito e faço push:"
+  },
+  {
+    "timestamp": "2026-05-14T21:28:46.327Z",
+    "source": "claude",
+    "git_branch": "main",
+    "git_user_name": "guilherme-messer",
+    "call_context": {
+      "cwd": "/home/gui/avengers-t2"
+    },
+    "role": "assistant",
+    "content": "Feito. O que mudou:\n\n- **`src/plugins/schemas.plugin.ts`** — registra todos os TypeBox schemas com `addSchema()`\n- **`src/plugins/swagger.plugin.ts`** — adiciona `refResolver.buildLocalReference` que usa `$id` como nome do componente (ao invés do `def-N` padrão do `@fastify/swagger`)\n- **`src/routes/events.routes.ts`** — rotas usam `{ $ref: 'SchemaId#' }` em vez dos objetos TypeBox diretamente\n- **`src/schemas/event.schema.ts`** — `EventListResponseSchema` ganhou `$id: 'EventListResponse'`\n\nNo Swagger UI, a aba **Schemas** agora vai mostrar `Event`, `CreateEvent`, `UpdateEvent`, `Section`, `EventRole`, `CreateEventRole`, `EventMetrics` e `EventListResponse` com nomes legíveis."
   }
 ]
