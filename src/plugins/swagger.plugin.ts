@@ -5,6 +5,11 @@ import type { FastifyInstance } from 'fastify'
 
 export default fp(async function swaggerPlugin(fastify: FastifyInstance) {
   await fastify.register(swagger, {
+    refResolver: {
+      buildLocalReference(json: Record<string, unknown>, _baseUri: unknown, _fragment: unknown, i: number) {
+        return (json.$id as string) ?? (json.title as string) ?? `def-${i}`
+      },
+    },
     openapi: {
       openapi: '3.1.0',
       info: {

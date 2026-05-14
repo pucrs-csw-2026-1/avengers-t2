@@ -1,19 +1,9 @@
 import { Type } from '@sinclair/typebox'
 import type { FastifyInstance } from 'fastify'
-import {
-  EventSchema,
-  CreateEventSchema,
-  UpdateEventSchema,
-  EventListResponseSchema,
-  type Event,
-} from '../schemas/event.schema.js'
-import { SectionSchema, type Section } from '../schemas/section.schema.js'
-import {
-  EventRoleSchema,
-  CreateEventRoleSchema,
-  type EventRole,
-} from '../schemas/event-role.schema.js'
-import { EventMetricsSchema, type EventMetrics } from '../schemas/metrics.schema.js'
+import type { Event } from '../schemas/event.schema.js'
+import type { Section } from '../schemas/section.schema.js'
+import type { EventRole } from '../schemas/event-role.schema.js'
+import type { EventMetrics } from '../schemas/metrics.schema.js'
 
 const MOCK_EVENT: Event = {
   id: 'evt_01hw',
@@ -67,8 +57,8 @@ export async function eventsRoutes(fastify: FastifyInstance) {
     schema: {
       tags: ['Events'],
       summary: 'Cria um evento',
-      body: CreateEventSchema,
-      response: { 201: EventSchema },
+      body: { $ref: 'CreateEvent#' },
+      response: { 201: { $ref: 'Event#' } },
     },
     handler: async (_req, reply) => {
       reply.status(201).send({ ...MOCK_EVENT, id: 'evt_new_' + Date.now() })
@@ -83,7 +73,7 @@ export async function eventsRoutes(fastify: FastifyInstance) {
         page: Type.Optional(Type.Integer({ minimum: 1, default: 1 })),
         limit: Type.Optional(Type.Integer({ minimum: 1, maximum: 100, default: 20 })),
       }),
-      response: { 200: EventListResponseSchema },
+      response: { 200: { $ref: 'EventListResponse#' } },
     },
     handler: async () => ({ data: [MOCK_EVENT], total: 1, page: 1, limit: 20 }),
   })
@@ -93,7 +83,7 @@ export async function eventsRoutes(fastify: FastifyInstance) {
       tags: ['Events'],
       summary: 'Busca evento por ID',
       params: ParamsIdSchema,
-      response: { 200: EventSchema },
+      response: { 200: { $ref: 'Event#' } },
     },
     handler: async () => MOCK_EVENT,
   })
@@ -103,8 +93,8 @@ export async function eventsRoutes(fastify: FastifyInstance) {
       tags: ['Events'],
       summary: 'Atualiza evento completo',
       params: ParamsIdSchema,
-      body: CreateEventSchema,
-      response: { 200: EventSchema },
+      body: { $ref: 'CreateEvent#' },
+      response: { 200: { $ref: 'Event#' } },
     },
     handler: async () => MOCK_EVENT,
   })
@@ -114,8 +104,8 @@ export async function eventsRoutes(fastify: FastifyInstance) {
       tags: ['Events'],
       summary: 'Atualiza evento parcialmente',
       params: ParamsIdSchema,
-      body: UpdateEventSchema,
-      response: { 200: EventSchema },
+      body: { $ref: 'UpdateEvent#' },
+      response: { 200: { $ref: 'Event#' } },
     },
     handler: async () => MOCK_EVENT,
   })
@@ -125,7 +115,7 @@ export async function eventsRoutes(fastify: FastifyInstance) {
       tags: ['Events'],
       summary: 'Soft delete — preenche deleted_at',
       params: ParamsIdSchema,
-      response: { 200: EventSchema },
+      response: { 200: { $ref: 'Event#' } },
     },
     handler: async () => ({
       ...MOCK_EVENT,
@@ -139,7 +129,7 @@ export async function eventsRoutes(fastify: FastifyInstance) {
       tags: ['Sections'],
       summary: 'Lista seções do evento',
       params: ParamsIdSchema,
-      response: { 200: Type.Array(SectionSchema) },
+      response: { 200: { type: 'array', items: { $ref: 'Section#' } } },
     },
     handler: async () => [MOCK_SECTION],
   })
@@ -149,7 +139,7 @@ export async function eventsRoutes(fastify: FastifyInstance) {
       tags: ['Roles'],
       summary: 'Lista roles com permissão de matrícula no evento',
       params: ParamsIdSchema,
-      response: { 200: Type.Array(EventRoleSchema) },
+      response: { 200: { type: 'array', items: { $ref: 'EventRole#' } } },
     },
     handler: async (req): Promise<EventRole[]> => {
       const { id } = req.params as { id: string }
@@ -165,8 +155,8 @@ export async function eventsRoutes(fastify: FastifyInstance) {
       tags: ['Roles'],
       summary: 'Adiciona role ao evento',
       params: ParamsIdSchema,
-      body: CreateEventRoleSchema,
-      response: { 201: EventRoleSchema },
+      body: { $ref: 'CreateEventRole#' },
+      response: { 201: { $ref: 'EventRole#' } },
     },
     handler: async (req, reply): Promise<void> => {
       const { id } = req.params as { id: string }
@@ -192,7 +182,7 @@ export async function eventsRoutes(fastify: FastifyInstance) {
       tags: ['Metrics'],
       summary: 'Métricas de ocupação e seções do evento',
       params: ParamsIdSchema,
-      response: { 200: EventMetricsSchema },
+      response: { 200: { $ref: 'EventMetrics#' } },
     },
     handler: async (req): Promise<EventMetrics> => {
       const { id } = req.params as { id: string }

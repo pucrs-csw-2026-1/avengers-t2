@@ -49,12 +49,15 @@ export const CreateEventSchema = Type.Object(
 
 export const UpdateEventSchema = Type.Partial(CreateEventSchema, { $id: 'UpdateEvent' })
 
-export const EventListResponseSchema = Type.Object({
-  data: Type.Array(EventSchema),
-  total: Type.Integer(),
-  page: Type.Integer(),
-  limit: Type.Integer(),
-})
+export const EventListResponseSchema = Type.Object(
+  {
+    data: Type.Array(EventSchema),
+    total: Type.Integer(),
+    page: Type.Integer(),
+    limit: Type.Integer(),
+  },
+  { $id: 'EventListResponse' },
+)
 
 export type Event = Static<typeof EventSchema>
 export type CreateEvent = Static<typeof CreateEventSchema>
