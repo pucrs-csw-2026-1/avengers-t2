@@ -1,0 +1,213 @@
+import { Type } from '@sinclair/typebox'
+import type { FastifyInstance } from 'fastify'
+import {
+  EventSchema,
+  CreateEventSchema,
+  UpdateEventSchema,
+  EventListResponseSchema,
+  type Event,
+} from '../schemas/event.schema.js'
+import { SectionSchema, type Section } from '../schemas/section.schema.js'
+import {
+  EventRoleSchema,
+  CreateEventRoleSchema,
+  type EventRole,
+} from '../schemas/event-role.schema.js'
+import { EventMetricsSchema, type EventMetrics } from '../schemas/metrics.schema.js'
+
+const MOCK_EVENT: Event = {
+  id: 'evt_01hw',
+  title: 'Inteligência Artificial na Prática',
+  description: 'Descrição do evento.',
+  starts_at: '2026-06-15T19:00:00-03:00',
+  ends_at: '2026-06-15T21:00:00-03:00',
+  timezone: 'America/Sao_Paulo',
+  registration_deadline: '2026-06-14T23:59:00-03:00',
+  location: {
+    venue: 'Auditório PUCRS',
+    address: 'Av. Ipiranga, 6681',
+    city: 'Porto Alegre',
+    state: 'RS',
+    country: 'BR',
+  },
+  capacity: 200,
+  category: 'tecnologia',
+  language: 'pt-BR',
+  created_at: '2026-05-01T10:00:00Z',
+  updated_at: '2026-05-10T08:30:00Z',
+  deleted_at: null,
+  deleted_by: null,
+  created_by: 'usr_123',
+}
+
+const MOCK_SECTION: Section = {
+  id_section: 'sec_01hw',
+  title_section: 'Introdução à IA',
+  description_section: 'Seção introdutória.',
+  type: 'palestra',
+  starts_at: '2026-06-15T19:00:00-03:00',
+  ends_at: '2026-06-15T20:00:00-03:00',
+  timezone: 'America/Sao_Paulo',
+  thumbnail_url: 'https://example.com/thumb.jpg',
+  capacity_section: 200,
+  workload_minutes: 60,
+  category_section: 'tecnologia',
+  language_section: 'pt-BR',
+  created_at: '2026-05-01T10:00:00Z',
+  updated_at: '2026-05-10T08:30:00Z',
+  deleted_at: null,
+  deleted_by: null,
+  created_by: 'usr_123',
+}
+
+const ParamsIdSchema = Type.Object({ id: Type.String() })
+
+export async function eventsRoutes(fastify: FastifyInstance) {
+  fastify.post('/events', {
+    schema: {
+      tags: ['Events'],
+      summary: 'Cria um evento',
+      body: CreateEventSchema,
+      response: { 201: EventSchema },
+    },
+    handler: async (_req, reply) => {
+      reply.status(201).send({ ...MOCK_EVENT, id: 'evt_new_' + Date.now() })
+    },
+  })
+
+  fastify.get('/events', {
+    schema: {
+      tags: ['Events'],
+      summary: 'Lista eventos com paginação',
+      querystring: Type.Object({
+        page: Type.Optional(Type.Integer({ minimum: 1, default: 1 })),
+        limit: Type.Optional(Type.Integer({ minimum: 1, maximum: 100, default: 20 })),
+      }),
+      response: { 200: EventListResponseSchema },
+    },
+    handler: async () => ({ data: [MOCK_EVENT], total: 1, page: 1, limit: 20 }),
+  })
+
+  fastify.get('/events/:id', {
+    schema: {
+      tags: ['Events'],
+      summary: 'Busca evento por ID',
+      params: ParamsIdSchema,
+      response: { 200: EventSchema },
+    },
+    handler: async () => MOCK_EVENT,
+  })
+
+  fastify.put('/events/:id', {
+    schema: {
+      tags: ['Events'],
+      summary: 'Atualiza evento completo',
+      params: ParamsIdSchema,
+      body: CreateEventSchema,
+      response: { 200: EventSchema },
+    },
+    handler: async () => MOCK_EVENT,
+  })
+
+  fastify.patch('/events/:id', {
+    schema: {
+      tags: ['Events'],
+      summary: 'Atualiza evento parcialmente',
+      params: ParamsIdSchema,
+      body: UpdateEventSchema,
+      response: { 200: EventSchema },
+    },
+    handler: async () => MOCK_EVENT,
+  })
+
+  fastify.delete('/events/:id', {
+    schema: {
+      tags: ['Events'],
+      summary: 'Soft delete — preenche deleted_at',
+      params: ParamsIdSchema,
+      response: { 200: EventSchema },
+    },
+    handler: async () => ({
+      ...MOCK_EVENT,
+      deleted_at: new Date().toISOString(),
+      deleted_by: 'usr_123',
+    }),
+  })
+
+  fastify.get('/events/:id/sections', {
+    schema: {
+      tags: ['Sections'],
+      summary: 'Lista seções do evento',
+      params: ParamsIdSchema,
+      response: { 200: Type.Array(SectionSchema) },
+    },
+    handler: async () => [MOCK_SECTION],
+  })
+
+  fastify.get('/events/:id/roles', {
+    schema: {
+      tags: ['Roles'],
+      summary: 'Lista roles com permissão de matrícula no evento',
+      params: ParamsIdSchema,
+      response: { 200: Type.Array(EventRoleSchema) },
+    },
+    handler: async (req): Promise<EventRole[]> => {
+      const { id } = req.params as { id: string }
+      return [
+        { event_id: id, role: 'student' },
+        { event_id: id, role: 'professor' },
+      ]
+    },
+  })
+
+  fastify.post('/events/:id/roles', {
+    schema: {
+      tags: ['Roles'],
+      summary: 'Adiciona role ao evento',
+      params: ParamsIdSchema,
+      body: CreateEventRoleSchema,
+      response: { 201: EventRoleSchema },
+    },
+    handler: async (req, reply): Promise<void> => {
+      const { id } = req.params as { id: string }
+      const { role } = req.body as { role: string }
+      reply.status(201).send({ event_id: id, role })
+    },
+  })
+
+  fastify.delete('/events/:id/roles/:role', {
+    schema: {
+      tags: ['Roles'],
+      summary: 'Remove role do evento',
+      params: Type.Object({ id: Type.String(), role: Type.String() }),
+      response: { 204: Type.Null() },
+    },
+    handler: async (_req, reply): Promise<void> => {
+      reply.status(204).send()
+    },
+  })
+
+  fastify.get('/events/:id/metrics', {
+    schema: {
+      tags: ['Metrics'],
+      summary: 'Métricas de ocupação e seções do evento',
+      params: ParamsIdSchema,
+      response: { 200: EventMetricsSchema },
+    },
+    handler: async (req): Promise<EventMetrics> => {
+      const { id } = req.params as { id: string }
+      return {
+        event_id: id,
+        capacity: 200,
+        enrolled: 143,
+        available_spots: 57,
+        occupancy_percentage: 71.5,
+        sections: {
+          total: 2,
+          by_type: { palestra: 1, workshop: 1 },
+          total_workload_minutes: 120,
+        },
+      }
+    },
+  })
+}
