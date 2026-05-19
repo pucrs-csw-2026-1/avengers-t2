@@ -176,28 +176,4 @@ export async function eventsRoutes(fastify: FastifyInstance) {
       reply.status(204).send()
     },
   })
-
-  fastify.get('/events/:id/metrics', {
-    schema: {
-      tags: ['Metrics'],
-      summary: 'Métricas de ocupação e seções do evento',
-      params: ParamsIdSchema,
-      response: { 200: { $ref: 'EventMetrics#' } },
-    },
-    handler: async (req): Promise<EventMetrics> => {
-      const { id } = req.params as { id: string }
-      return {
-        event_id: id,
-        capacity: 200,
-        enrolled: 143,
-        available_spots: 57,
-        occupancy_percentage: 71.5,
-        sections: {
-          total: 2,
-          by_type: { palestra: 1, workshop: 1 },
-          total_workload_minutes: 120,
-        },
-      }
-    },
-  })
 }
