@@ -3,7 +3,7 @@ import type { FastifyInstance } from 'fastify'
 import type { Event } from '../schemas/event.schema.js'
 import type { Section } from '../schemas/section.schema.js'
 import type { EventRole } from '../schemas/event-role.schema.js'
-import type { EventMetrics } from '../schemas/metrics.schema.js'
+import type { EventsMetrics } from '../schemas/metrics.schema.js'
 
 const MOCK_EVENT: Event = {
   id: 'evt_01hw',
@@ -76,6 +76,24 @@ export async function eventsRoutes(fastify: FastifyInstance) {
       response: { 200: { $ref: 'EventListResponse#' } },
     },
     handler: async () => ({ data: [MOCK_EVENT], total: 1, page: 1, limit: 20 }),
+  })
+
+  fastify.get('/events/metrics', {
+    schema: {
+      tags: ['Events'],
+      summary: 'Métricas agregadas de todos os eventos',
+      response: { 200: { $ref: 'EventsMetrics#' } },
+    },
+    handler: async (): Promise<EventsMetrics> => ({
+      total_events: 1,
+      total_sections: 1,
+      total_capacity: 200,
+      total_enrolled: 87,
+      total_available_spots: 113,
+      average_occupancy_percentage: 43.5,
+      events_by_category: { tecnologia: 1 },
+      events_by_status: { upcoming: 1, ongoing: 0, past: 0 },
+    }),
   })
 
   fastify.get('/events/:id', {

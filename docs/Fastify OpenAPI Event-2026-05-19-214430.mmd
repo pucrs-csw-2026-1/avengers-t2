@@ -1,0 +1,72 @@
+---
+config:
+  layout: elk
+---
+graph TB
+    subgraph EXT["Externos"]
+        CLIENT["Cliente HTTP"]
+        BROWSER["Browser — Swagger UI"]
+        GHPAGES["GitHub Pages<br/>docs/openapi.json"]
+    end
+
+    subgraph SRV["Fastify Server — :3000"]
+        direction TB
+
+        subgraph BOOT["Bootstrap · index.ts"]
+            MAIN["main()"]
+        end
+
+        subgraph PLG["Plugins  (ordem de registro)"]
+            SP["1 · swaggerPlugin<br/>@fastify/swagger + @fastify/swagger-ui<br/>OpenAPI 3.1  ·  /docs"]
+            SCP["2 · schemasPlugin<br/>registra 8 TypeBox schemas<br/>como componentes OpenAPI reutilizáveis"]
+        end
+
+        subgraph RT["Routes"]
+            ER["eventsRoutes<br/>events.routes.ts"]
+        end
+
+        subgraph SCH["TypeBox Schemas"]
+            direction LR
+            ES["event.schema<br/>Event · CreateEvent<br/>UpdateEvent · EventListResponse"]
+            SS["section.schema<br/>Section"]
+            RS["event-role.schema<br/>EventRole · CreateEventRole"]
+            MS["metrics.schema<br/>EventMetrics · EventsMetrics"]
+        end
+    end
+
+    subgraph CICD["CI/CD · GitHub Actions"]
+        WF["docs.yml<br/>push → main"]
+        GS["generate-spec.ts<br/>(tsx)"]
+        OJ["docs/openapi.json"]
+    end
+
+    CLIENT -->|"REST JSON"| ER
+    BROWSER -->|"GET /docs"| SP
+
+    MAIN -->|"register"| SP
+    MAIN -->|"register"| SCP
+    MAIN -->|"register"| ER
+
+    ES -->|"addSchema()"| SCP
+    SS -->|"addSchema()"| SCP
+    RS -->|"addSchema()"| SCP
+    MS -->|"addSchema()"| SCP
+    SCP -->|"validação via $ref"| ER
+
+    WF -->|"npm run generate-spec"| GS
+    GS -->|"server.swagger()"| OJ
+    OJ -->|"deploy pages"| GHPAGES
+
+    classDef external fill:#f0f9ff,stroke:#38bdf8
+    classDef server fill:#f0fdf4,stroke:#4ade80
+    classDef plugin fill:#fdf4ff,stroke:#e879f9
+    classDef schema fill:#fff7ed,stroke:#fb923c
+    classDef cicd fill:#fef2f2,stroke:#f87171
+    classDef route fill:#f5f3ff,stroke:#a78bfa
+
+    class CLIENT,BROWSER,GHPAGES external
+    class SRV,BOOT server
+    class SP,SCP plugin
+    class ES,SS,RS,MS schema
+    class WF,GS,OJ cicd
+    class ER route

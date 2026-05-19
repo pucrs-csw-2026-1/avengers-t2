@@ -27,3 +27,32 @@ export const EventMetricsSchema = Type.Object(
 )
 
 export type EventMetrics = Static<typeof EventMetricsSchema>
+
+export const EventsMetricsSchema = Type.Object(
+  {
+    total_events: Type.Integer({ description: 'Total de eventos cadastrados' }),
+    total_sections: Type.Integer({ description: 'Total de seções em todos os eventos' }),
+    total_capacity: Type.Integer({ description: 'Soma da capacidade de todos os eventos' }),
+    total_enrolled: Type.Integer({ description: 'Total de inscrições em todos os eventos' }),
+    total_available_spots: Type.Integer({ description: 'Total de vagas disponíveis' }),
+    average_occupancy_percentage: Type.Number({
+      minimum: 0,
+      maximum: 100,
+      description: 'Percentual médio de ocupação dos eventos',
+    }),
+    events_by_category: Type.Record(Type.String(), Type.Integer(), {
+      description: 'Contagem de eventos agrupados por categoria',
+    }),
+    events_by_status: Type.Object(
+      {
+        upcoming: Type.Integer({ description: 'Eventos ainda não iniciados' }),
+        ongoing: Type.Integer({ description: 'Eventos em andamento' }),
+        past: Type.Integer({ description: 'Eventos encerrados' }),
+      },
+      { description: 'Distribuição dos eventos por status temporal' },
+    ),
+  },
+  { $id: 'EventsMetrics' },
+)
+
+export type EventsMetrics = Static<typeof EventsMetricsSchema>
